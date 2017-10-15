@@ -23,33 +23,37 @@ class Users {
     @POST()
     @Path("login")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.TEXT_PLAIN)
-    fun login(customer: Customer): Response? {
-        if(customer.userName.isBlank() || customer.password.isBlank())
-            return Response.status(400).entity("Username or password cannot be blank").build()
+    @Produces(MediaType.APPLICATION_JSON)
+    fun login(user: User): Response? {
+        if(user.userName.isNullOrBlank() || user.password.isNullOrBlank())
+            return Response.status(400).entity(Error("Username or password cannot be blank")).build()
 
-        val hashedPW = userPassword.get(customer.userName)
+        val hashedPW = userPassword[user.userName]
 
-        if(BCrypt.checkpw(customer.password, hashedPW)) {
-            return Response.ok().entity("Login successful").build();
+        if(hashedPW != null && BCrypt.checkpw(user.password, hashedPW)) {
+            return Response.ok().entity(Token("asdf")).build();
         } else
-            return Response.status(400).entity("User/password not recognized").build();
+            return Response.status(400).entity(Error("User/password not recognized")).build();
     }
 
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @POST()
     @Path("register")
-    fun register(customer: Customer): Response? {
+    fun register(user: User): Response? {
 
-        if(customer.userName.isBlank() || customer.password.isBlank())
-            return Response.status(400).entity("Username or password cannot be blank").build()
+        if(user.userName.isNullOrBlank() || user.password.isNullOrBlank())
+            return Response.status(400).entity(Error("Username or password cannot be blank")).build()
 
-        userPassword.put(customer.userName, BCrypt.hashpw(customer.password, BCrypt.gensalt()))
+        userPassword.put(user.userName!!, BCrypt.hashpw(user.password, BCrypt.gensalt()))
 
-        return Response.ok(customer).build();
+        return Response.ok(user).build();
     }
 
 }
 
-data class Customer(val userName: String, val password: String)
+data class User(val userName: String?, val password: String?)
+
+data class Token(val token: String)
+
+data class Error(val message: String)
