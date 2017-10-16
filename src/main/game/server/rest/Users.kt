@@ -1,6 +1,10 @@
 package game.server.rest
 
-import game.server.crypto.BCrypt
+import game.server.db.DBConfig
+import game.server.login.BCrypt
+import game.server.model.User
+import io.requery.kotlin.eq
+import mu.KotlinLogging
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
@@ -11,12 +15,10 @@ import javax.ws.rs.core.Response
  * send user details as body because URLs/parameters are usually output to logs
  */
 
+private val logger = KotlinLogging.logger {}
+
 @Path("/users/")
 class Users {
-    companion object {
-        val userPassword = mutableMapOf<String, String>();
-    }
-
     /**
      * On successful login give back session token
      */
@@ -24,35 +26,40 @@ class Users {
     @Path("login")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    fun login(user: User): Response? {
+    fun login(user: UserLogin): Response {
+        logger.info { "login called for ${user.userName}"}
         if(user.userName.isNullOrBlank() || user.password.isNullOrBlank())
             return Response.status(400).entity(Error("Username or password cannot be blank")).build()
 
-        val hashedPW = userPassword[user.userName]
+        val result = DBConfig.data select (User::class) where (User::name eq user.userName) limit 1
+
+        val hashedPW = result.get().firstOrNull()?.password
 
         if(hashedPW != null && BCrypt.checkpw(user.password, hashedPW)) {
             return Response.ok().entity(Token("asdf")).build();
         } else
-            return Response.status(400).entity(Error("User/password not recognized")).build();
+            return Response.status(400).entity(Error("UserLogin/password not recognized")).build();
     }
 
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @POST()
     @Path("register")
-    fun register(user: User): Response? {
-
+    fun register(user: UserLogin): Response {
+        logger.debug { "register called for ${user.userName}" }
         if(user.userName.isNullOrBlank() || user.password.isNullOrBlank())
             return Response.status(400).entity(Error("Username or password cannot be blank")).build()
 
-        userPassword.put(user.userName!!, BCrypt.hashpw(user.password, BCrypt.gensalt()))
+        val hashedPW = BCrypt.hashpw(user.password, BCrypt.gensalt())
+
+        DBConfig.data insert User(user.userName!!, hashedPW)
 
         return Response.ok(user).build();
     }
 
 }
 
-data class User(val userName: String?, val password: String?)
+data class UserLogin(val userName: String?, val password: String?)
 
 data class Token(val token: String)
 

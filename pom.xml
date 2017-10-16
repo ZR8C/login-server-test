@@ -61,6 +61,39 @@
             <!--<version>${kotlin.version}</version>-->
             <!--<scope>test</scope>-->
         <!--</dependency>-->
+
+        <!-- loggers -->
+        <dependency>
+            <groupId>io.github.microutils</groupId>
+            <artifactId>kotlin-logging</artifactId>
+            <version>1.4.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.5</version>
+        </dependency>
+
+        
+
+        <dependency>
+            <groupId>io.requery</groupId>
+            <artifactId>requery-kotlin</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.requery</groupId>
+            <artifactId>requery-processor</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.196</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -75,6 +108,27 @@
 
                 <configuration/>
                 <executions>
+                    <execution>
+                        <id>kapt</id>
+                        <goals>
+                            <goal>kapt</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirs>
+                                <sourceDir>src/main/kotlin</sourceDir>
+                                <sourceDir>src/main/java</sourceDir>
+                            </sourceDirs>
+                            <annotationProcessorPaths>
+                                <!-- Specify your annotation processors here. -->
+                                <annotationProcessorPath>
+                                    <groupId>com.google.dagger</groupId>
+                                    <artifactId>dagger-compiler</artifactId>
+                                    <version>2.9</version>
+                                </annotationProcessorPath>
+                            </annotationProcessorPaths>
+                        </configuration>
+                    </execution>
+
                     <execution>
                         <id>compile</id>
                         <phase>compile</phase>

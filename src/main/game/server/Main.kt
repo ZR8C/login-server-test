@@ -5,6 +5,8 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import game.server.rest.ServerApplication
 import org.glassfish.jersey.jetty.JettyHttpContainerFactory
 import org.glassfish.jersey.server.ResourceConfig
+import org.h2.jdbcx.JdbcDataSource
+import javax.sql.DataSource
 import javax.ws.rs.core.UriBuilder
 import javax.ws.rs.ext.ContextResolver
 
