@@ -12,9 +12,9 @@ class DBConfig {
 
         private val jdbcDataSource = JdbcDataSource()
         init {
-            jdbcDataSource.setUrl("jdbc:h2:˜./test")
-            jdbcDataSource.user = "test"
-            jdbcDataSource.password = "test"
+            jdbcDataSource.setUrl("jdbc:h2:file:~/data/test;AUTO_SERVER=TRUE")
+            jdbcDataSource.user = "test1"
+            jdbcDataSource.password = "abc1"
         }
 
         private val configuration = KotlinConfiguration(dataSource = jdbcDataSource, model = Models.DEFAULT)

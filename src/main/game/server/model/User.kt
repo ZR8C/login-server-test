@@ -1,11 +1,14 @@
 package game.server.model
 
-import io.requery.Entity
-import io.requery.Key
+import io.requery.*
+import java.time.ZonedDateTime
 
 @Entity
-data class User constructor(
+interface User : Persistable {
         @get:Key
-        var name: String,
+        var name: String
         var password: String
-)
+
+        @get:OneToMany(cascade = arrayOf(CascadeAction.NONE))
+        val sessions: List<Session>
+}

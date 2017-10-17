@@ -18,9 +18,6 @@ fun main(args: Array<String>) {
     val resource = ResourceConfig.forApplication(ServerApplication())
             .register(ContextResolver<ObjectMapper> { ObjectMapper().registerModule(KotlinModule()) })
 
-//    val resource = ResourceConfig.forApplicationClass(ServerApplication::class.java)
-//            .register(ContextResolver<ObjectMapper> { ObjectMapper().registerModule(KotlinModule()) })
-
     val jettyServer = JettyHttpContainerFactory.createServer(uri, resource)
 
     try {
