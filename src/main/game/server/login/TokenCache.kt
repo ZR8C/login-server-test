@@ -1,10 +1,8 @@
 package game.server.login
 
-import com.google.common.cache.Cache
-import com.google.common.cache.CacheBuilder
-import com.google.common.cache.CacheLoader
-import com.google.common.cache.LoadingCache
-import com.google.common.util.concurrent.UncheckedExecutionException
+import com.github.benmanes.caffeine.cache.Cache
+import com.github.benmanes.caffeine.cache.Caffeine
+import com.github.benmanes.caffeine.cache.LoadingCache
 import game.server.db.DBConfig
 import game.server.model.Session
 import game.server.model.SessionEntity
@@ -19,7 +17,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
- * Holds session tokens. Sessions are held for an hour after the last access providing they are on this node
+ * Holds session tokens. Sessions are held for an hour after the last access providing they are on this node.
  * sessions from another node are persisted in the database for an hour since first login
  */
 
@@ -27,12 +25,11 @@ private val logger = KotlinLogging.logger {}
 
 class TokenCache {
     companion object {
-        val cache = CacheBuilder.newBuilder()
+        val cache: Cache<String, String> = Caffeine.newBuilder()
                 .expireAfterAccess(1, TimeUnit.HOURS)
-                .build(CacheLoader.from(this::retrieveTokenFromDB))
+                .build();
 
         fun createSession(user: User) : String {
-
             val token = generateToken()
             cache.put(token, user.name)
 
@@ -59,11 +56,7 @@ class TokenCache {
             val anHourAgo = ZonedDateTime.now(ZoneId.of("UTC")).minusHours(1)
             val result = DBConfig.data.select(Session::class) where(Session::token eq token) and (Session::created gte anHourAgo) orderBy(Session::created.desc())
 
-            val session = result.get().firstOrNull()
-
-            if(session == null) {
-                throw IllegalStateException("Tried to retrieve a user session that doesn't exist or is expired")
-            }
+            val session = result.get().firstOrNull() ?: return null
 
             logger.debug { "Token retrieved from DB $token = ${session.user.name}"}
 
@@ -71,11 +64,7 @@ class TokenCache {
         }
 
         fun validateToken(token: String): String? {
-            try {
-                return cache.get(token)
-            } catch (e: UncheckedExecutionException) {
-                return null
-            }
+            return cache.get(token, this::retrieveTokenFromDB)
         }
     }
 }
