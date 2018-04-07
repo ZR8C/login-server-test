@@ -4,15 +4,21 @@ Logins are persisted for an hour both in memory and in DB with potential for mul
 ## Screenshots
 
 ### Register
+#### Success
 ![register success](https://i.imgur.com/1vdZDQr.png)
+#### Failure
 ![register failure](https://i.imgur.com/mCWHuBh.png)
 
 ### Login
+#### Success
 ![login success](https://i.imgur.com/urShgNa.png)
+#### Failure
 ![login failure](https://i.imgur.com/NcHmLbs.png)
 
 ### Token check
+#### Success
 ![token check success](https://i.imgur.com/kovskLK.png)
+#### Failure
 ![token check failure](https://i.imgur.com/liryZKv.png)
 
 # Stack
