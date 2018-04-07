@@ -6,13 +6,14 @@ import io.requery.sql.KotlinEntityDataStore
 import io.requery.sql.SchemaModifier
 import io.requery.sql.TableCreationMode
 import org.h2.jdbcx.JdbcDataSource
+import java.util.*
 
 class DBConfig {
     companion object {
 
         private val jdbcDataSource = JdbcDataSource()
         init {
-            jdbcDataSource.setUrl("jdbc:h2:file:~/data/test;AUTO_SERVER=TRUE")
+            jdbcDataSource.setUrl("jdbc:h2:file:./data/db")
             jdbcDataSource.user = "test1"
             jdbcDataSource.password = "abc1"
         }
