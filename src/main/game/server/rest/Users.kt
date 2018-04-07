@@ -60,8 +60,8 @@ class Users {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @POST()
-    @Path("do")
-    fun doSomething(token: Token): Response {
+    @Path("checktoken")
+    fun checkToken(token: Token): Response {
         logger.debug { "do called for $token" }
 
         val userName = validateToken(token.token)
